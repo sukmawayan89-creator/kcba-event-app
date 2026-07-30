@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INTERNAL EVENT KCBA 2026 - Leaderboard & Piagam</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@500;700;800&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&family=Great+Vibes&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/src/style.css">
+    
+    <!-- Chart.js for Radar Chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <!-- Background Glow Elements -->
+    <div class="glow-bg">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
+    </div>
+
+    <!-- ================================================ -->
+    <!-- LOGIN SCREEN (shown before main app) -->
+    <!-- ================================================ -->
+    <div id="login-screen" class="login-screen" style="display:none;">
+        <div class="login-card">
+            <!-- Logo & Title -->
+            <div class="login-logo-area">
+                <img src="/logo.png" alt="KCBA Logo" class="login-logo">
+                <h1 class="login-title">THE VOICE KCBA</h1>
+                <p class="login-subtitle">INTERNAL EVENT 2026</p>
+            </div>
+
+            <!-- Tab Switcher -->
+            <div class="login-tabs">
+                <button class="login-tab active" id="login-tab-owner">
+                    <i data-lucide="shield"></i> Owner
+                </button>
+                <button class="login-tab" id="login-tab-judge">
+                    <i data-lucide="users"></i> Juri
+                </button>
+            </div>
+
+            <!-- Panel: Owner Login -->
+            <div class="login-panel" id="login-panel-owner">
+                <p class="login-hint">Masukkan password untuk akses penuh sebagai Owner.</p>
+                <div class="login-input-group">
+                    <i data-lucide="lock"></i>
+                    <input type="password" id="owner-password-input" class="login-input" placeholder="Masukkan Password..." maxlength="10">
+                </div>
+                <div id="owner-error" class="login-error" style="display:none;">
+                    <i data-lucide="alert-circle"></i> Password salah! Coba lagi.
+                </div>
+                <button id="btn-owner-login" class="login-btn login-btn-owner">
+                    <i data-lucide="log-in"></i> Masuk sebagai Owner
+                </button>
+            </div>
+
+            <!-- Panel: Judge Login -->
+            <div class="login-panel" id="login-panel-judge" style="display:none;">
+                <p class="login-hint">Pilih nama Anda untuk masuk ke lembar penilaian.</p>
+                <div class="login-select-group">
+                    <select id="judge-select" class="login-select">
+                        <option value="">-- Pilih Nama Juri --</option>
+                        <option value="mput">MPUT — Kualitas Vocal</option>
+                        <option value="nur">NUR — Artikulasi</option>
+                        <option value="khrisna">KHRISNA — Pronounce</option>
+                        <option value="dewi">DEWI — Pitch Control</option>
+                        <option value="cecep">CECEP — Tempo</option>
+                        <option value="wildan">WILDAN — Penghayatan</option>
+                        <option value="way">WAY — Teknik Vocal</option>
+                    </select>
+                </div>
+                <button id="btn-judge-login" class="login-btn login-btn-judge">
+                    <i data-lucide="log-in"></i> Masuk sebagai Juri
+                </button>
+            </div>
+
+            <p class="login-footer">KOMUNITAS COLLAB BOLLY ASIA • 2026</p>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTAINER (Always Visible) -->
+    <div class="app-container" id="main-app-container">
+        
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-area">
+                <div class="app-logo-box">
+                    <img src="/logo.png" alt="KCBA Logo" class="app-header-logo">
+                </div>
+                <div class="header-text">
+                    <h1 class="glow-text">THE VOICE KCBA</h1>
+                    <p class="subtitle">INTERNAL EVENT KCBA 2026 • KOMUNITAS COLLAB BOLLY ASIA</p>
+                </div>
+            </div>
+
+            <!-- Judge Badge (shown when logged in as judge) -->
+            <div class="judge-badge" id="judge-badge" style="display:none;">
+                <div class="judge-badge-info">
+                    <span class="judge-badge-name" id="judge-badge-name">JURI</span>
+                    <span class="judge-badge-criteria" id="judge-badge-criteria">Kriteria</span>
+                </div>
+                <button class="judge-badge-logout" id="btn-logout" title="Keluar">
+                    <i data-lucide="log-out"></i> Keluar
+                </button>
+            </div>
+
+            <!-- Share Event link (Owner only) -->
+            <div class="header-share-bar" id="header-share-bar">
+                <div class="input-with-copy-btn">
+                    <input type="text" id="header-event-link" class="form-control text-sm text-center" readonly placeholder="Menghubungkan cloud...">
+                    <button id="btn-header-copy-link" class="action-btn glow-btn-gold btn-sm" title="Salin Link Event untuk Juri">
+                        <i data-lucide="copy"></i> <span>Salin Link</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <nav class="tab-navigation">
+                <button class="nav-btn active" data-tab="leaderboard-tab">
+                    <i data-lucide="trophy"></i> <span>Leaderboard</span>
+                </button>
+                <button class="nav-btn" data-tab="certificate-tab" id="nav-cert-btn">
+                    <i data-lucide="award"></i> <span>Piagam Pemenang</span>
+                </button>
+                <button class="nav-btn" data-tab="admin-tab">
+                    <i data-lucide="sliders"></i> <span>Penilaian &amp; Cloud</span>
+                </button>
+            </nav>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+
+            <!-- TAB 1: LEADERBOARD -->
+            <section id="leaderboard-tab" class="tab-pane active">
+                <div class="section-header">
+                    <div class="title-with-toggle">
+                        <h2>Leaderboard</h2>
+                        <!-- Season Selector Toggle -->
+                        <div class="season-toggle-bar">
+                            <button class="season-toggle-btn active" data-season="1">Season 1 (Kualifikasi)</button>
+                            <button class="season-toggle-btn" data-season="2">Season 2 (Final Terbaik)</button>
+                        </div>
+                    </div>
+                    <div class="header-actions">
+                        <div class="search-box">
+                            <i data-lucide="search"></i>
+                            <input type="text" id="search-input" placeholder="Cari nama peserta...">
+                        </div>
+                        <button id="btn-live-stage" class="action-btn glow-btn-gold">
+                            <i data-lucide="monitor"></i> Live Stage Mode
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Top 3 Podium Cards -->
+                <div class="podium-container" id="podium-area">
+                    <!-- Will be injected by JS dynamically -->
+                </div>
+
+                <!-- Ranking List Table -->
+                <div class="leaderboard-card">
+                    <div class="table-responsive">
+                        <table class="leaderboard-table">
+                            <thead>
+                                <tr>
+                                    <th width="80">Peringkat</th>
+                                    <th>Nama Peserta</th>
+                                    <th>Judul Lagu</th>
+                                    <th class="score-col hide-mobile">Vokal (J1)</th>
+                                    <th class="score-col hide-mobile">Artikulasi (J2)</th>
+                                    <th class="score-col hide-mobile">Pronounce (J3)</th>
+                                    <th class="score-col hide-mobile">Pitch (J4)</th>
+                                    <th class="score-col hide-mobile">Tempo (J5)</th>
+                                    <th class="score-col hide-mobile">Feel (J6)</th>
+                                    <th class="score-col total-head">Total Skor</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboard-body">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="no-data-msg" class="no-data-alert" style="display: none;">
+                        <i data-lucide="info" size="36"></i>
+                        <p>Belum ada data peserta untuk season ini. Silakan hubungi Admin untuk inisialisasi data.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: CERTIFICATE GENERATOR -->
+            <section id="certificate-tab" class="tab-pane">
+                <!-- Cert Mode Selector -->
+                <div class="cert-mode-selector-bar">
+                    <button class="cert-mode-btn active" id="btn-mode-single">
+                        <i data-lucide="user"></i> Cetak Piagam Tunggal
+                    </button>
+                    <button class="cert-mode-btn" id="btn-mode-winners">
+                        <i data-lucide="crown"></i> Cetak 4 Juara Akhir (Season 2)
+                    </button>
+                </div>
+
+                <!-- MODE A: SINGLE CERTIFICATE PRINT -->
+                <div id="cert-single-mode-area" class="grid-layout">
+                    <!-- Left: Control Panel -->
+                    <div class="control-panel">
+                        <h3>Konfigurasi Piagam</h3>
+                        
+                        <div class="form-group">
+                            <label><i data-lucide="database"></i> Sumber Season</label>
+                            <div class="season-toggle-bar w-100" style="margin-bottom: 0;">
+                                <button class="season-toggle-btn active py-1" id="cert-season-s1-btn">Season 1</button>
+                                <button class="season-toggle-btn py-1" id="cert-season-s2-btn">Season 2</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cert-participant-select"><i data-lucide="user"></i> Pilih Peserta</label>
+                            <select id="cert-participant-select" class="form-control">
+                                <option value="">-- Pilih Peserta --</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cert-title-select"><i data-lucide="tag"></i> Gelar Juara</label>
+                            <select id="cert-title-select" class="form-control">
+                                <option value="JUARA 1">JUARA 1</option>
+                                <option value="JUARA 2">JUARA 2</option>
+                                <option value="JUARA 3">JUARA 3</option>
+                                <option value="JUARA FAVORIT">JUARA FAVORIT</option>
+                                <option value="PESERTA TERBAIK">PESERTA TERBAIK</option>
+                            </select>
+                        </div>
+
+
+
+                        <div class="action-buttons" id="cert-single-actions">
+                            <button id="btn-download-cert" class="action-btn glow-btn-gold w-100 mb-2">
+                                <i data-lucide="download"></i> Unduh Piagam (PNG)
+                            </button>
+                            <button id="btn-print-cert" class="action-btn outline-btn w-100">
+                                <i data-lucide="printer"></i> Cetak / Simpan PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="preview-panel">
+                        <div class="preview-header-bar">
+                            <span>PREVIEW PIAGAM RESMI (KCBA STYLE)</span>
+                            <span class="preview-status"><i data-lucide="eye"></i> WYSIWYG</span>
+                        </div>
+                        <div class="cert-outer-wrapper">
+                            <div id="certificate-canvas" class="certificate-container" style="background-image: url('/certificate_bg_juara1.jpg');">
+                                <div class="cert-overlay-name" id="cert-display-name">NAMA PESERTA</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODE B: 4 WINNERS AUTOMATED PANEL -->
+                <div id="cert-winners-mode-area" class="winners-panel-wrapper" style="display: none;">
+                    <div class="winners-panel-header">
+                        <h3><i data-lucide="crown"></i> Cetak Otomatis 4 Juara Akhir</h3>
+                        <p class="helper-text">Pemenang Juara I, II, dan III diambil otomatis dari peringkat 1 s.d 3 di Season 2. Anda bisa memilih penerima Juara Terfavorit menggunakan dropdown di bawah ini.</p>
+                        
+                        <div class="winners-config-bar">
+                            <div class="form-group inline-group">
+                                <label for="winner-fav-select">Juara Terfavorit:</label>
+                                <select id="winner-fav-select" class="form-control select-sm">
+                                    <option value="">-- Pilih Juara Terfavorit --</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Grid layout of the 4 winner cards -->
+                    <div class="champions-grid">
+                        
+                        <!-- Champion 1 Card -->
+                        <div class="champion-card-box">
+                            <div class="champion-box-header">
+                                <span class="badge gold">JUARA I</span>
+                                <h4 id="box-c1-name">-</h4>
+                            </div>
+                            <div class="champion-box-actions" id="winner-c1-actions">
+                                <button class="action-btn glow-btn-gold btn-sm btn-download-winner" data-rank="1">
+                                    <i data-lucide="download"></i> Unduh PNG
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Champion 2 Card -->
+                        <div class="champion-card-box">
+                            <div class="champion-box-header">
+                                <span class="badge silver">JUARA II</span>
+                                <h4 id="box-c2-name">-</h4>
+                            </div>
+                            <div class="champion-box-actions" id="winner-c2-actions">
+                                <button class="action-btn outline-btn-gold btn-sm btn-download-winner" data-rank="2">
+                                    <i data-lucide="download"></i> Unduh PNG
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Champion 3 Card -->
+                        <div class="champion-card-box">
+                            <div class="champion-box-header">
+                                <span class="badge bronze">JUARA III</span>
+                                <h4 id="box-c3-name">-</h4>
+                            </div>
+                            <div class="champion-box-actions" id="winner-c3-actions">
+                                <button class="action-btn outline-btn-gold btn-sm btn-download-winner" data-rank="3">
+                                    <i data-lucide="download"></i> Unduh PNG
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Champion Favorite Card -->
+                        <div class="champion-card-box">
+                            <div class="champion-box-header">
+                                <span class="badge magenta">TERFAVORIT</span>
+                                <h4 id="box-cfav-name">-</h4>
+                            </div>
+                            <div class="champion-box-actions" id="winner-cfav-actions">
+                                <button class="action-btn outline-btn-gold btn-sm btn-download-winner" data-rank="fav">
+                                    <i data-lucide="download"></i> Unduh PNG
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Hidden container for HD renders (Portrait) -->
+                    <div style="position: absolute; left: -9999px; top: -9999px;">
+                        <div id="hidden-winner-canvas" class="certificate-container" style="background-image: url('/certificate_bg_juara1.jpg');">
+                            <div class="cert-overlay-name" id="hidden-c-name">NAMA</div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- TAB 3: ADMIN & CLOUD SYNCHRONIZATION -->
+            <section id="admin-tab" class="tab-pane">
+                <div class="grid-layout cols-1-2">
+                    
+                    <!-- Left column: Connection Settings & Poster Info -->
+                    <div class="admin-sidebar">
+                        
+                        <!-- Toggle Season for Admin page -->
+                        <div class="admin-card mb-3" id="admin-season-selector-card">
+                            <h3><i data-lucide="layers"></i> Pilih Babak Penilaian</h3>
+                            <div class="season-toggle-bar w-100" style="margin-bottom: 0;">
+                                <button class="season-toggle-btn active" id="admin-season-s1-btn">Season 1 (Kualifikasi)</button>
+                                <button class="season-toggle-btn" id="admin-season-s2-btn">Season 2 (Final)</button>
+                            </div>
+                        </div>
+
+                        <!-- Cloud Database Info Card -->
+                        <div class="admin-card">
+                            <h3><i data-lucide="cloud"></i> Event Cloud Database</h3>
+                            <div class="form-group">
+                                <label for="admin-event-link">Link Unik Event (Bagikan Ke Juri)</label>
+                                <div class="input-with-copy-btn">
+                                    <input type="text" id="admin-event-link" class="form-control text-sm" readonly>
+                                    <button id="btn-copy-event-link" class="action-btn glow-btn-gold btn-sm" title="Salin Link">
+                                        <i data-lucide="copy"></i> Salin
+                                    </button>
+                                </div>
+                                <small class="form-text text-muted">
+                                    Kirim link di atas ke juri lain agar mereka bisa menilai secara bersamaan dari perangkat mereka.
+                                </small>
+                            </div>
+
+                            <div class="sync-status connected" id="cloud-sync-status-msg">
+                                <i data-lucide="cloud-lightning"></i> Database: Terhubung Cloud
+                            </div>
+
+                            <div class="admin-actions mt-3" id="admin-only-actions">
+                                <div id="promosi-area" style="margin-bottom: 20px;">
+                                    <h4 style="font-size:0.9rem;margin-bottom:8px;color:#ffffff;"><i data-lucide="trending-up"></i> Promosi Finalis</h4>
+                                    <p class="helper-text" style="font-size:0.75rem;">Saring dan promosikan 5 peserta terbaik dari Season 1 secara otomatis ke Season 2 di database Cloud.</p>
+                                    <button id="btn-promote-finalists" class="action-btn glow-btn-gold w-100">
+                                        <i data-lucide="sparkles"></i> Promosikan 5 Terbaik
+                                    </button>
+                                </div>
+
+                                <button id="btn-reset-data" class="action-btn danger-btn w-100">
+                                    <i data-lucide="trash-2"></i> Reset Database Event (Kembali Contoh)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right column: Interactive Spreadsheet-like Table -->
+                    <div class="admin-main">
+                        <div class="admin-card flex-column">
+                            <div class="admin-card-header">
+                                <h3 id="admin-table-title"><i data-lucide="table"></i> Manajemen Nilai - Season 1</h3>
+                                <button id="btn-add-row" class="action-btn outline-btn-gold btn-sm">
+                                    <i data-lucide="user-plus"></i> Tambah Peserta
+                                </button>
+                            </div>
+
+                            <div class="table-responsive flex-grow-1 mt-2">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nama Peserta</th>
+                                            <th>Judul Lagu</th>
+                                            <th class="score-header" title="MPUT: Kualitas Vocal">Vokal (MPUT)</th>
+                                            <th class="score-header" title="NUR: Artikulasi">Artik. (NUR)</th>
+                                            <th class="score-header" title="KHRISNA: Pronounce">Pron. (KHRISNA)</th>
+                                            <th class="score-header" title="DEWI: Pitch Control">Pitch (DEWI)</th>
+                                            <th class="score-header" title="CECEP: Tempo">Tempo (CECEP)</th>
+                                            <th class="score-header" title="WILDAN: Penghayatan">Feel (WILDAN)</th>
+                                            <th class="score-header" title="WAY: Teknik Vocal">Teknik (WAY)</th>
+                                            <th width="60">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-table-body">
+                                        <!-- Editable rows dynamically injected here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div style="margin-top: 10px; font-size: 0.8rem; color: var(--text-muted);">
+                                💡 *Rentang input nilai juri adalah <strong>50 - 100</strong>. Isikan 0 atau kosongkan untuk status Belum Dinilai.*
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL: Participant Performance Detail -->
+    <div id="participant-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-card">
+            <button class="modal-close-btn" id="btn-close-modal">
+                <i data-lucide="x"></i>
+            </button>
+            <div class="modal-header">
+                <h2 id="modal-participant-name">Nama Peserta</h2>
+                <p id="modal-participant-song" class="modal-subtitle">Judul Lagu Bollywood</p>
+            </div>
+            <div class="modal-content">
+                <div class="modal-grid">
+                    <!-- Left: Radar Chart -->
+                    <div class="chart-container">
+                        <canvas id="performance-chart"></canvas>
+                    </div>
+                    <!-- Right: Performance Numbers -->
+                    <div class="scores-summary">
+                        <h3>Analisis Kriteria Juri</h3>
+                        <div class="score-stat-grid">
+                            <div class="stat-card">
+                                <span class="stat-label">Kualitas Vocal</span>
+                                <strong class="stat-value" id="val-vocal">0</strong>
+                                <span class="stat-judge">MPUT</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-label">Artikulasi</span>
+                                <strong class="stat-value" id="val-artikulasi">0</strong>
+                                <span class="stat-judge">NUR</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-label">Pronounce</span>
+                                <strong class="stat-value" id="val-pronounce">0</strong>
+                                <span class="stat-judge">KHRISNA</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-label">Pitch Control</span>
+                                <strong class="stat-value" id="val-pitch">0</strong>
+                                <span class="stat-judge">DEWI</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-label">Tempo</span>
+                                <strong class="stat-value" id="val-tempo">0</strong>
+                                <span class="stat-judge">CECEP</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-label">Penghayatan</span>
+                                <strong class="stat-value" id="val-feel">0</strong>
+                                <span class="stat-judge">WILDAN</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-label">Teknik Vocal</span>
+                                <strong class="stat-value" id="val-teknik">0</strong>
+                                <span class="stat-judge">WAY</span>
+                            </div>
+                        </div>
+                        <div class="score-total-footer">
+                            <span>TOTAL SKOR AKHIR</span>
+                            <h2 id="val-total-score">0.00</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OVERLAY: Live Stage View -->
+    <div id="live-stage-overlay" class="live-stage-container" style="display: none;">
+        <button class="live-close-btn" id="btn-close-live">
+            <i data-lucide="minimize-2"></i> Keluar Layar Penuh
+        </button>
+        
+        <div class="live-header">
+            <div class="live-logo-container">
+                <img src="/logo.png" alt="KCBA Logo" class="live-stage-logo">
+            </div>
+            <h1 class="live-title" id="live-stage-title">THE VOICE KCBA</h1>
+            <p class="live-subtitle" id="live-stage-subtitle">SEASON 1 LEADERBOARD</p>
+        </div>
+
+        <div class="live-stage-content">
+            <!-- Left Side: Top 3 Stage Display -->
+            <div class="live-podium-area" id="live-podium-display">
+                <!-- Podiums -->
+            </div>
+            
+            <!-- Right Side: Scrollable Leaderboard List -->
+            <div class="live-list-area">
+                <div class="live-list-header">
+                    <span>Rank</span>
+                    <span>Peserta & Lagu</span>
+                    <span style="text-align: right;">Total Nilai</span>
+                </div>
+                <div class="live-ranking-list" id="live-ranking-list-body">
+                    <!-- Dynamic live rows -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Marquee Text Footer -->
+        <div class="live-footer">
+            <div class="marquee-wrapper">
+                <div class="marquee-content">
+                    🔥 INTERNAL EVENT KCBA 2026 • Khusus Member Komunitas Collab Bolly Asia • Penilaian Berlangsung secara Real-time • Selamat Berkompetisi untuk seluruh Bintang KCBA! 🔥
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Module JS -->
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>
