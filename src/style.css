@@ -2498,51 +2498,36 @@ select.form-control option {
         padding: 16px 12px;
     }
 
-    /* Leaderboard rows — optimized padding and sizing for mobile screens */
-    .leaderboard-row td {
-        padding: 10px 6px !important;
+    /* Leaderboard rows — scrollable table configuration for mobile screens */
+    .leaderboard-table .hide-mobile {
+        display: table-cell !important; /* Show score columns on mobile */
     }
     .leaderboard-table { 
-        font-size: 0.8rem !important;
-        table-layout: fixed;
-        width: 100%;
+        font-size: 0.82rem !important;
+        table-layout: auto !important;
+        width: max-content !important;
+        min-width: 950px !important; /* Force width so it scrolls horizontally without squishing */
     }
-    .leaderboard-table th {
-        padding: 10px 6px !important;
-        font-size: 0.72rem !important;
-        letter-spacing: 0.5px !important;
+    .leaderboard-table th,
+    .leaderboard-table td {
+        padding: 12px 10px !important;
+        white-space: nowrap !important;
     }
-    .leaderboard-table th:nth-child(1),
-    .leaderboard-table td:nth-child(1) {
-        width: 48px !important;
-        padding-left: 6px !important;
-        padding-right: 2px !important;
-    }
-    .leaderboard-table th:nth-child(2),
-    .leaderboard-table td:nth-child(2) {
-        padding-left: 4px !important;
-        padding-right: 4px !important;
-        word-break: break-word;
-    }
-    .leaderboard-table th:nth-child(3),
+    .leaderboard-table td:nth-child(2),
     .leaderboard-table td:nth-child(3) {
-        padding-left: 4px !important;
-        padding-right: 4px !important;
-        word-break: break-word;
-    }
-    .leaderboard-table th.total-head,
-    .leaderboard-table td.td-total-score {
-        width: 72px !important;
-        padding-left: 2px !important;
-        padding-right: 6px !important;
-        text-align: right !important;
+        white-space: normal !important; /* Allow name and song to wrap */
     }
     .rank-num-circle {
-        width: 28px !important;
-        height: 28px !important;
-        font-size: 0.8rem !important;
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 0.85rem !important;
     }
     .td-total-score {
-        font-size: 0.98rem !important;
+        font-size: 1.05rem !important;
+    }
+    .table-responsive {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 8px;
     }
 }
