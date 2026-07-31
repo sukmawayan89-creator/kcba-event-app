@@ -2498,9 +2498,51 @@ select.form-control option {
         padding: 16px 12px;
     }
 
-    /* Leaderboard rows — bigger tap area */
+    /* Leaderboard rows — optimized padding and sizing for mobile screens */
     .leaderboard-row td {
-        padding: 14px 10px;
+        padding: 10px 6px !important;
     }
-    .leaderboard-table { font-size: 0.85rem; }
+    .leaderboard-table { 
+        font-size: 0.8rem !important;
+        table-layout: fixed;
+        width: 100%;
+    }
+    .leaderboard-table th {
+        padding: 10px 6px !important;
+        font-size: 0.72rem !important;
+        letter-spacing: 0.5px !important;
+    }
+    .leaderboard-table th:nth-child(1),
+    .leaderboard-table td:nth-child(1) {
+        width: 48px !important;
+        padding-left: 6px !important;
+        padding-right: 2px !important;
+    }
+    .leaderboard-table th:nth-child(2),
+    .leaderboard-table td:nth-child(2) {
+        padding-left: 4px !important;
+        padding-right: 4px !important;
+        word-break: break-word;
+    }
+    .leaderboard-table th:nth-child(3),
+    .leaderboard-table td:nth-child(3) {
+        padding-left: 4px !important;
+        padding-right: 4px !important;
+        word-break: break-word;
+    }
+    .leaderboard-table th.total-head,
+    .leaderboard-table td.td-total-score {
+        width: 72px !important;
+        padding-left: 2px !important;
+        padding-right: 6px !important;
+        text-align: right !important;
+    }
+    .rank-num-circle {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 0.8rem !important;
+    }
+    .td-total-score {
+        font-size: 0.98rem !important;
+    }
 }

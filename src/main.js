@@ -459,6 +459,7 @@ function renderLeaderboard() {
             <td class="score-col hide-mobile">${p.scores.pitch || '-'}</td>
             <td class="score-col hide-mobile">${p.scores.tempo || '-'}</td>
             <td class="score-col hide-mobile">${p.scores.feel || '-'}</td>
+            <td class="score-col hide-mobile">${p.scores.teknik || '-'}</td>
             <td class="td-total-score">${p.total.toFixed(2)}</td>
         `;
 
