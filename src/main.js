@@ -105,11 +105,19 @@ let searchInput, leaderboardBody, noDataMsg, podiumArea;
 let adminTableBody, btnAddRow, adminEventLink, btnCopyEventLink, cloudSyncStatusMsg;
 let btnResetData, btnCloseModal, participantModal, btnCloseLive, btnLiveStage, liveStageOverlay;
 let btnPromoteFinalists, liveStageTitle, liveStageSubtitle;
-let headerEventLink, btnHeaderCopyLink;
+let headerEventLink, btnHeaderCopyLink, btnHeaderCopyViewerLink;
+let adminViewerLink, btnCopyViewerLink;
 
 // --- Initialize App ---
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
+
+    // Check for viewer role in URL to bypass login
+    const urlParams = new URLSearchParams(window.location.search);
+    const roleParam = urlParams.get('role');
+    if (roleParam === 'viewer') {
+        sessionStorage.setItem('kcba_role', 'viewer');
+    }
 
     // Start with login screen - proceed to app only after successful login
     initLogin((role) => {
@@ -124,8 +132,28 @@ function applyRoleBasedUI(role) {
     const judgeBadge = document.getElementById('judge-badge');
     const certTab = document.getElementById('nav-cert-btn');
     const shareBar = document.getElementById('header-share-bar');
+    const adminTab = document.querySelector('.nav-btn[data-tab="admin-tab"]');
+    const btnCloseLive = document.getElementById('btn-close-live');
+    const liveStageOverlay = document.getElementById('live-stage-overlay');
 
-    if (judgeInfo) {
+    if (role === 'viewer') {
+        // PUBLIC VIEWER MODE: Bypass login screen and lock inside Live Stage Mode
+        judgeBadge.style.display = 'none';
+        if (certTab) certTab.style.display = 'none';
+        if (shareBar) shareBar.style.display = 'none';
+        if (adminTab) adminTab.style.display = 'none';
+        
+        // Hide the exit fullscreen button for viewers (lock-in)
+        if (btnCloseLive) btnCloseLive.style.display = 'none';
+        
+        // Automatically open Live Stage overlay
+        setTimeout(() => {
+            if (liveStageOverlay) {
+                liveStageOverlay.style.display = 'flex';
+                renderLiveStage();
+            }
+        }, 100);
+    } else if (judgeInfo) {
         // JUDGE MODE: show badge, hide cert tab and share bar
         judgeBadge.style.display = 'flex';
         document.getElementById('judge-badge-name').textContent = judgeInfo.name;
@@ -133,11 +161,13 @@ function applyRoleBasedUI(role) {
         judgeBadge.style.setProperty('--judge-color', judgeInfo.color);
         if (certTab) certTab.style.display = 'none';
         if (shareBar) shareBar.style.display = 'none';
+        if (btnCloseLive) btnCloseLive.style.display = '';
     } else {
         // OWNER MODE: show share bar, hide badge
         judgeBadge.style.display = 'none';
         if (certTab) certTab.style.display = '';
         if (shareBar) shareBar.style.display = '';
+        if (btnCloseLive) btnCloseLive.style.display = '';
     }
 
     // Logout button
@@ -150,6 +180,7 @@ function bootApp() {
     // Cache App Header Share elements
     headerEventLink = document.getElementById('header-event-link');
     btnHeaderCopyLink = document.getElementById('btn-header-copy-link');
+    btnHeaderCopyViewerLink = document.getElementById('btn-header-copy-viewer-link');
 
     // Cache App Dashboard Elements
     searchInput = document.getElementById('search-input');
@@ -160,6 +191,8 @@ function bootApp() {
     btnAddRow = document.getElementById('btn-add-row');
     adminEventLink = document.getElementById('admin-event-link');
     btnCopyEventLink = document.getElementById('btn-copy-event-link');
+    adminViewerLink = document.getElementById('admin-viewer-link');
+    btnCopyViewerLink = document.getElementById('btn-copy-viewer-link');
     cloudSyncStatusMsg = document.getElementById('cloud-sync-status-msg');
     
     btnResetData = document.getElementById('btn-reset-data');
@@ -219,8 +252,16 @@ function setupActiveInterface() {
         ? `${window.location.origin}${window.location.pathname}`
         : `${window.location.origin}${window.location.pathname}?event=${state.eventId}`;
         
+    const viewerUrl = state.eventId === 'local'
+        ? `${window.location.origin}${window.location.pathname}?role=viewer`
+        : `${window.location.origin}${window.location.pathname}?event=${state.eventId}&role=viewer`;
+        
     headerEventLink.value = state.eventId === 'local' ? "Penyimpanan Lokal (Offline)" : eventUrl;
     adminEventLink.value = state.eventId === 'local' ? "Penyimpanan Lokal (Offline)" : eventUrl;
+    
+    if (adminViewerLink) {
+        adminViewerLink.value = state.eventId === 'local' ? "Penyimpanan Lokal (Offline)" : viewerUrl;
+    }
     
     setupTabs();
     setupEventListeners();
@@ -389,6 +430,11 @@ function startCloudPolling() {
             renderAdminTable();
             updateCertificateDropdown(state.activeSeason === '1' ? state.participants : state.participantsSeason2);
             renderWinnersPanel(state);
+            
+            // Auto update live stage if visible or if role is viewer
+            if ((liveStageOverlay && liveStageOverlay.style.display === 'flex') || getCurrentRole() === 'viewer') {
+                renderLiveStage();
+            }
         } catch (err) {
             console.warn("Polling fetch failed (temporary network error):", err);
         }
@@ -709,6 +755,23 @@ function setupEventListeners() {
         }, 1500);
     });
 
+    // Copy Viewer Link Button (Admin Tab)
+    if (btnCopyViewerLink) {
+        btnCopyViewerLink.addEventListener('click', () => {
+            adminViewerLink.select();
+            adminViewerLink.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(adminViewerLink.value);
+            
+            const originalText = btnCopyViewerLink.innerHTML;
+            btnCopyViewerLink.innerHTML = `<i data-lucide="check"></i> Tersalin`;
+            lucide.createIcons();
+            setTimeout(() => {
+                btnCopyViewerLink.innerHTML = originalText;
+                lucide.createIcons();
+            }, 1500);
+        });
+    }
+
     // Copy Event Link Button (Header Bar)
     btnHeaderCopyLink.addEventListener('click', () => {
         headerEventLink.select();
@@ -723,6 +786,24 @@ function setupEventListeners() {
             lucide.createIcons();
         }, 1500);
     });
+
+    // Copy Viewer Link Button (Header Bar)
+    if (btnHeaderCopyViewerLink) {
+        btnHeaderCopyViewerLink.addEventListener('click', () => {
+            const viewerUrl = state.eventId === 'local'
+                ? `${window.location.origin}${window.location.pathname}?role=viewer`
+                : `${window.location.origin}${window.location.pathname}?event=${state.eventId}&role=viewer`;
+            navigator.clipboard.writeText(viewerUrl);
+            
+            const originalText = btnHeaderCopyViewerLink.innerHTML;
+            btnHeaderCopyViewerLink.innerHTML = `<i data-lucide="check"></i> <span>Tersalin</span>`;
+            lucide.createIcons();
+            setTimeout(() => {
+                btnHeaderCopyViewerLink.innerHTML = originalText;
+                lucide.createIcons();
+            }, 1500);
+        });
+    }
 
     // Promote 5 Finalists from Season 1 to Season 2
     btnPromoteFinalists.addEventListener('click', async () => {

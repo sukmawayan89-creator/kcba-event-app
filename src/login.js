@@ -103,4 +103,19 @@ export function initLogin(onLoginSuccess) {
         panelOwner.style.display = "none";
         ownerError.style.display = "none";
     });
+
+    // Handle Viewer login button
+    const btnViewer = document.getElementById("btn-login-as-viewer");
+    if (btnViewer) {
+        btnViewer.addEventListener("click", () => {
+            sessionStorage.setItem("kcba_role", "viewer");
+            loginScreen.style.display = "none";
+            mainApp.style.display = "";
+            onLoginSuccess("viewer");
+        });
+    }
 }
+
+
+
+

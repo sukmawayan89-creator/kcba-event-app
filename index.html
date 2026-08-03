@@ -84,6 +84,13 @@
                 </button>
             </div>
 
+            <!-- Viewer Button (Public Access) -->
+            <div class="login-viewer-area" style="margin-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 15px; text-align: center;">
+                <button id="btn-login-as-viewer" class="action-btn outline-btn-gold w-100">
+                    <i data-lucide="monitor"></i> Lihat Live Stage (Penonton)
+                </button>
+            </div>
+
             <p class="login-footer">KOMUNITAS COLLAB BOLLY ASIA • 2026</p>
         </div>
     </div>
@@ -116,10 +123,13 @@
 
             <!-- Share Event link (Owner only) -->
             <div class="header-share-bar" id="header-share-bar">
-                <div class="input-with-copy-btn">
+                <div class="input-with-copy-btn" style="gap: 8px;">
                     <input type="text" id="header-event-link" class="form-control text-sm text-center" readonly placeholder="Menghubungkan cloud...">
                     <button id="btn-header-copy-link" class="action-btn glow-btn-gold btn-sm" title="Salin Link Event untuk Juri">
-                        <i data-lucide="copy"></i> <span>Salin Link</span>
+                        <i data-lucide="copy"></i> <span>Link Juri</span>
+                    </button>
+                    <button id="btn-header-copy-viewer-link" class="action-btn glow-btn-magenta btn-sm" title="Salin Link Live Stage untuk Penonton">
+                        <i data-lucide="monitor"></i> <span>Link Penonton</span>
                     </button>
                 </div>
             </div>
@@ -372,7 +382,7 @@
                         <div class="admin-card">
                             <h3><i data-lucide="cloud"></i> Event Cloud Database</h3>
                             <div class="form-group">
-                                <label for="admin-event-link">Link Unik Event (Bagikan Ke Juri)</label>
+                                <label for="admin-event-link">Link Unik Event (Juri)</label>
                                 <div class="input-with-copy-btn">
                                     <input type="text" id="admin-event-link" class="form-control text-sm" readonly>
                                     <button id="btn-copy-event-link" class="action-btn glow-btn-gold btn-sm" title="Salin Link">
@@ -380,7 +390,20 @@
                                     </button>
                                 </div>
                                 <small class="form-text text-muted">
-                                    Kirim link di atas ke juri lain agar mereka bisa menilai secara bersamaan dari perangkat mereka.
+                                    Kirim link di atas ke juri lain agar mereka bisa menilai secara bersamaan.
+                                </small>
+                            </div>
+
+                            <div class="form-group" style="margin-top: 15px;">
+                                <label for="admin-viewer-link">Link Live Stage (Penonton / Peserta)</label>
+                                <div class="input-with-copy-btn">
+                                    <input type="text" id="admin-viewer-link" class="form-control text-sm" readonly>
+                                    <button id="btn-copy-viewer-link" class="action-btn glow-btn-magenta btn-sm" title="Salin Link Penonton">
+                                        <i data-lucide="monitor"></i> Salin Link
+                                    </button>
+                                </div>
+                                <small class="form-text text-muted">
+                                    Bagikan link ini ke penonton/peserta untuk melihat Live Stage secara real-time (tanpa login).
                                 </small>
                             </div>
 
