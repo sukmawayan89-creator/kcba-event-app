@@ -208,25 +208,42 @@ function bootApp() {
     // Check for Event ID in URL (?event=XYZ)
     const urlParams = new URLSearchParams(window.location.search);
     let eventParam = urlParams.get('event');
-    
-    if (!eventParam) {
+    const isViewer = getCurrentRole() === 'viewer';
+
+    // For VIEWER: always use URL param only — never read from localStorage
+    // This prevents old cached data from showing on audience screens
+    if (!isViewer && !eventParam) {
         eventParam = localStorage.getItem('kcba_event_id');
     }
 
     if (!eventParam) {
-        headerEventLink && (headerEventLink.value = "Menghubungkan cloud...");
-        (async () => {
-            const newBinId = await createNewEventOnCloud();
-            if (newBinId) {
-                localStorage.setItem('kcba_event_id', newBinId);
-                window.location.search = `?event=${newBinId}`;
-            } else {
-                initializeLocalMode();
-            }
-        })();
+        if (isViewer) {
+            // Viewer without event ID in URL — show waiting screen in Live Stage
+            state.eventId = 'waiting';
+            setupActiveInterface();
+            const liveOverlay = document.getElementById('live-stage-overlay');
+            const liveTitle = document.getElementById('live-stage-title');
+            const liveSub = document.getElementById('live-stage-subtitle');
+            if (liveOverlay) liveOverlay.style.display = 'flex';
+            if (liveTitle) liveTitle.textContent = 'THE VOICE KCBA';
+            if (liveSub) liveSub.textContent = 'Menghubungkan ke event...';
+        } else {
+            headerEventLink && (headerEventLink.value = "Menghubungkan cloud...");
+            (async () => {
+                const newBinId = await createNewEventOnCloud();
+                if (newBinId) {
+                    localStorage.setItem('kcba_event_id', newBinId);
+                    window.location.search = `?event=${newBinId}`;
+                } else {
+                    initializeLocalMode();
+                }
+            })();
+        }
     } else {
         state.eventId = eventParam.trim();
-        localStorage.setItem('kcba_event_id', state.eventId);
+        if (!isViewer) {
+            localStorage.setItem('kcba_event_id', state.eventId);
+        }
 
         if (state.eventId === 'local') {
             initializeLocalMode();
@@ -236,8 +253,15 @@ function bootApp() {
                     await fetchStateFromCloud();
                     setupActiveInterface();
                 } catch (e) {
-                    console.warn("Gagal terhubung cloud. Membuka dalam mode penyimpanan lokal.", e);
-                    initializeLocalMode();
+                    if (isViewer) {
+                        // Viewer: retry cloud fetch — never fall back to local data
+                        console.warn("Viewer: gagal terhubung cloud, akan mencoba lagi...", e);
+                        setupActiveInterface();
+                        startCloudPolling(); // keep polling until connected
+                    } else {
+                        console.warn("Gagal terhubung cloud. Membuka dalam mode penyimpanan lokal.", e);
+                        initializeLocalMode();
+                    }
                 }
             })();
         }
