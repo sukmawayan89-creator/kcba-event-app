@@ -364,10 +364,16 @@ function tabClickListener(e) {
 // --- Cloud Actions (Firebase Realtime Database REST API) ---
 async function createNewEventOnCloud() {
     try {
+        // If real data already exists locally (from a previous offline session),
+        // carry it over to the new cloud event instead of overwriting with samples.
+        const existingS1 = localStorage.getItem('kcba_local_s1');
+        const existingS2 = localStorage.getItem('kcba_local_s2');
+        const existingSeason = localStorage.getItem('kcba_local_season');
+
         const initData = {
-            participants: DEFAULT_PARTICIPANTS,
-            participantsSeason2: DEFAULT_PARTICIPANTS_S2,
-            activeSeason: '1'
+            participants: existingS1 ? JSON.parse(existingS1) : DEFAULT_PARTICIPANTS,
+            participantsSeason2: existingS2 ? JSON.parse(existingS2) : DEFAULT_PARTICIPANTS_S2,
+            activeSeason: existingSeason || '1'
         };
         const response = await fetch(`${FIREBASE_DB_URL}/${FIREBASE_EVENTS_PATH}.json`, {
             method: 'POST',

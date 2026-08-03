@@ -19,6 +19,10 @@ const OWNER_PASSWORD = "00000";
 function extractEventCode(rawValue) {
     const value = (rawValue || "").trim();
     if (!value) return null;
+    const lower = value.toLowerCase();
+    if (lower === "baru" || lower === "new" || lower === "reset") {
+        return "__FORCE_NEW__"; // special signal: clear any stuck local/offline event id
+    }
     try {
         if (value.includes("event=")) {
             const url = new URL(value, window.location.origin);
@@ -29,6 +33,17 @@ function extractEventCode(rawValue) {
         // Not a valid URL, fall through and treat as raw code
     }
     return value;
+}
+
+function applyEventCodeOverride(rawInputValue) {
+    const eventCode = extractEventCode(rawInputValue);
+    if (!eventCode) return;
+    if (eventCode === "__FORCE_NEW__") {
+        // Clear any previously-stuck 'local' or old event id so bootApp() creates a fresh cloud event
+        localStorage.removeItem("kcba_event_id");
+    } else {
+        localStorage.setItem("kcba_event_id", eventCode);
+    }
 }
 
 export function getCurrentRole() {
@@ -72,11 +87,7 @@ export function initLogin(onLoginSuccess) {
             sessionStorage.setItem("kcba_role", "owner");
 
             const eventCodeInput = document.getElementById("owner-event-code-input");
-            const eventCode = extractEventCode(eventCodeInput ? eventCodeInput.value : null);
-            if (eventCode) {
-                // Force this device to join the same cloud event as other devices
-                localStorage.setItem("kcba_event_id", eventCode);
-            }
+            applyEventCodeOverride(eventCodeInput ? eventCodeInput.value : null);
 
             loginScreen.style.display = "none";
             mainApp.style.display = "";
@@ -105,11 +116,7 @@ export function initLogin(onLoginSuccess) {
         sessionStorage.setItem("kcba_role", selectedId);
 
         const eventCodeInput = document.getElementById("judge-event-code-input");
-        const eventCode = extractEventCode(eventCodeInput ? eventCodeInput.value : null);
-        if (eventCode) {
-            // Force this device to join the same cloud event as other devices
-            localStorage.setItem("kcba_event_id", eventCode);
-        }
+        applyEventCodeOverride(eventCodeInput ? eventCodeInput.value : null);
 
         loginScreen.style.display = "none";
         mainApp.style.display = "";
