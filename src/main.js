@@ -981,8 +981,10 @@ function renderLiveStage() {
         
         podium.innerHTML = `
             <div class="live-podium-avatar">${rank}</div>
-            <div class="live-podium-name">${escapeHtml(p.name)}</div>
-            <div class="live-podium-song">${escapeHtml(p.song)}</div>
+            <div class="live-podium-name-area">
+                <div class="live-podium-name">${escapeHtml(p.name)}</div>
+                <div class="live-podium-song">${escapeHtml(p.song)}</div>
+            </div>
             <div class="live-podium-score">${p.total.toFixed(2)}</div>
         `;
         

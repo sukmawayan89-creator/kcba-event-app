@@ -2542,3 +2542,136 @@ select.form-control option {
         border-radius: 8px;
     }
 }
+
+/* Custom Responsive styling for Live Stage on Mobile Phones */
+@media (max-width: 768px) {
+    .live-stage-container {
+        padding: 15px 10px 60px 10px !important; /* Extra bottom padding for marquee */
+    }
+
+    .live-header {
+        margin-bottom: 15px !important;
+    }
+
+    .live-logo-container {
+        width: 50px !important;
+        height: 50px !important;
+        margin-bottom: 5px !important;
+    }
+
+    .live-title {
+        font-size: 1.5rem !important;
+    }
+
+    .live-subtitle {
+        font-size: 0.75rem !important;
+        letter-spacing: 2px !important;
+    }
+
+    .live-stage-content {
+        gap: 20px !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .live-podium-area {
+        grid-template-columns: 1fr !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+        padding: 15px 10px !important;
+        border-radius: 16px !important;
+    }
+
+    .live-podium {
+        padding: 12px 15px !important;
+        display: flex !important;
+        align-items: center !important;
+        text-align: left !important;
+        gap: 12px !important;
+        border-radius: 12px !important;
+    }
+
+    .live-podium-1 { order: 1 !important; }
+    .live-podium-2 { order: 2 !important; }
+    .live-podium-3 { order: 3 !important; }
+
+    .live-podium-1::before {
+        content: '👑' !important;
+        font-size: 1.8rem !important;
+        top: -16px !important;
+        left: 20px !important;
+        transform: none !important;
+    }
+
+    .live-podium-avatar {
+        margin: 0 !important;
+        width: 38px !important;
+        height: 38px !important;
+        font-size: 1.1rem !important;
+    }
+
+    .live-podium-name-area {
+        display: flex !important;
+        flex-direction: column !important;
+        min-width: 0 !important;
+        flex: 1 !important;
+    }
+
+    .live-podium-name {
+        font-size: 1.05rem !important;
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        line-height: 1.2 !important;
+    }
+
+    .live-podium-song {
+        font-size: 0.75rem !important;
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        margin-bottom: 0 !important;
+        margin-top: 2px !important;
+    }
+
+    .live-podium-score {
+        font-size: 1.4rem !important;
+        margin-left: auto !important;
+        min-width: 65px !important;
+        text-align: right !important;
+    }
+
+    .live-podium-1 .live-podium-score {
+        font-size: 1.7rem !important;
+    }
+
+    /* Adjust Live List columns for Mobile */
+    .live-list-header {
+        grid-template-columns: 40px 1fr 80px !important;
+        padding: 10px 10px !important;
+        font-size: 0.7rem !important;
+    }
+
+    .live-list-row {
+        grid-template-columns: 40px 1fr 80px !important;
+        padding: 10px 10px !important;
+    }
+
+    .live-list-rank {
+        width: 26px !important;
+        height: 26px !important;
+        font-size: 0.8rem !important;
+    }
+
+    .live-list-name {
+        font-size: 0.9rem !important;
+    }
+
+    .live-list-song {
+        font-size: 0.72rem !important;
+    }
+
+    .live-list-score {
+        font-size: 1rem !important;
+    }
+}
