@@ -233,6 +233,12 @@ function bootApp() {
                 const newBinId = await createNewEventOnCloud();
                 if (newBinId) {
                     localStorage.setItem('kcba_event_id', newBinId);
+                    alert(
+                        `Event baru berhasil dibuat!\n\nKODE EVENT ANDA: ${newBinId}\n\n` +
+                        `PENTING: Simpan kode ini. Saat login sebagai Owner atau Juri di perangkat lain ` +
+                        `(HP, laptop lain, dll), masukkan kode ini di kolom "Kode Event" pada layar login ` +
+                        `agar semua perangkat menampilkan data yang sama.`
+                    );
                     window.location.search = `?event=${newBinId}`;
                 } else {
                     initializeLocalMode();

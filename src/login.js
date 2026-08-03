@@ -14,6 +14,23 @@ export const JUDGES = [
 
 const OWNER_PASSWORD = "00000";
 
+// Accepts either a plain event code, or a full pasted link like
+// https://xxx.vercel.app/?event=ABC123 — extracts the code either way.
+function extractEventCode(rawValue) {
+    const value = (rawValue || "").trim();
+    if (!value) return null;
+    try {
+        if (value.includes("event=")) {
+            const url = new URL(value, window.location.origin);
+            const code = url.searchParams.get("event");
+            if (code) return code.trim();
+        }
+    } catch (e) {
+        // Not a valid URL, fall through and treat as raw code
+    }
+    return value;
+}
+
 export function getCurrentRole() {
     return sessionStorage.getItem("kcba_role") || null;
 }
@@ -53,6 +70,14 @@ export function initLogin(onLoginSuccess) {
         const pw = ownerPasswordInput.value.trim();
         if (pw === OWNER_PASSWORD) {
             sessionStorage.setItem("kcba_role", "owner");
+
+            const eventCodeInput = document.getElementById("owner-event-code-input");
+            const eventCode = extractEventCode(eventCodeInput ? eventCodeInput.value : null);
+            if (eventCode) {
+                // Force this device to join the same cloud event as other devices
+                localStorage.setItem("kcba_event_id", eventCode);
+            }
+
             loginScreen.style.display = "none";
             mainApp.style.display = "";
             onLoginSuccess("owner");
@@ -78,6 +103,14 @@ export function initLogin(onLoginSuccess) {
             return;
         }
         sessionStorage.setItem("kcba_role", selectedId);
+
+        const eventCodeInput = document.getElementById("judge-event-code-input");
+        const eventCode = extractEventCode(eventCodeInput ? eventCodeInput.value : null);
+        if (eventCode) {
+            // Force this device to join the same cloud event as other devices
+            localStorage.setItem("kcba_event_id", eventCode);
+        }
+
         loginScreen.style.display = "none";
         mainApp.style.display = "";
         onLoginSuccess(selectedId);
