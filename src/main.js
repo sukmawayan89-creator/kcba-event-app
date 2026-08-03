@@ -468,7 +468,14 @@ function startCloudPolling() {
         try {
             await fetchStateFromCloud();
             renderLeaderboard();
-            renderAdminTable();
+
+            // Don't rebuild the admin table while the user is actively typing in it —
+            // doing so destroys the focused input and causes stuttering/lost keystrokes.
+            const isEditingAdminTable = adminTableBody && adminTableBody.contains(document.activeElement);
+            if (!isEditingAdminTable) {
+                renderAdminTable();
+            }
+
             updateCertificateDropdown(state.activeSeason === '1' ? state.participants : state.participantsSeason2);
             renderWinnersPanel(state);
             
